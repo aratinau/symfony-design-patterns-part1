@@ -2,6 +2,7 @@
 
 namespace App\Character;
 
+use App\AttackType\AttackType;
 use App\Dice;
 
 class Character
@@ -15,25 +16,22 @@ class Character
     public function __construct(
         private int $maxHealth,
         private int $baseDamage,
-        private float $armor
+        private float $armor,
+        private AttackType $attackType
     ) {
         $this->currentHealth = $this->maxHealth;
     }
 
-    /**
-     * Damage: 1d6 (1 dice of 6)
-     */
     public function attack(): int
     {
         $this->currentStamina -= (25 + Dice::roll(20));
         if ($this->currentStamina <= 0) {
             // can't attack this turn
             $this->currentStamina = self::MAX_STAMINA;
-
             return 0;
         }
 
-        return $this->baseDamage + Dice::roll(6);
+        return $this->attackType->performAttack($this->baseDamage);
     }
 
     public function receiveAttack(int $damage): int
