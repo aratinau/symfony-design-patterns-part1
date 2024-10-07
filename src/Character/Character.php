@@ -2,6 +2,7 @@
 
 namespace App\Character;
 
+use App\ArmorType\ArmorType;
 use App\AttackType\AttackType;
 use App\Dice;
 
@@ -16,8 +17,8 @@ class Character
     public function __construct(
         private int $maxHealth,
         private int $baseDamage,
-        private float $armor,
-        private AttackType $attackType
+        private AttackType $attackType,
+        private ArmorType $armorType
     ) {
         $this->currentHealth = $this->maxHealth;
     }
@@ -36,8 +37,8 @@ class Character
 
     public function receiveAttack(int $damage): int
     {
-        $armorReduction = (int) ($damage * $this->armor);
-        $damageTaken = $damage - $armorReduction;
+        $armorReduction = $this->armorType->getArmorReduction($damage);
+        $damageTaken = max($damage - $armorReduction, 0);
         $this->currentHealth -= $damageTaken;
 
         return $damageTaken;
