@@ -5,9 +5,13 @@ namespace App;
 use App\Builder\CharacterBuilder;
 use App\Builder\CharacterBuilderFactory;
 use App\Character\Character;
+use App\Observer\GameObserverInterface;
 
 class GameApplication
 {
+    /** @var GameObserverInterface[] */
+    private array $observers = [];
+
     public function __construct(
         private CharacterBuilderFactory $characterBuilderFactory
     ) {
@@ -91,6 +95,21 @@ class GameApplication
         };
     }
 
+    public function subscribe(GameObserverInterface $observer): void
+    {
+        if (!in_array($observer, $this->observers, true)) {
+            $this->observers[] = $observer;
+        }
+    }
+
+    public function unsubscribe(GameObserverInterface $observer): void
+    {
+        $key = array_search($observer, $this->observers, true);
+        if ($key !== false) {
+            unset($this->observers[$key]);
+        }
+    }
+
     public function getCharactersList(): array
     {
         return [
@@ -105,6 +124,8 @@ class GameApplication
     {
         $fightResult->setWinner($winner);
         $fightResult->setLoser($loser);
+
+        $this->notify($fightResult);
 
         return $fightResult;
     }
@@ -123,5 +144,12 @@ class GameApplication
          * L'instanciation est dans createBuilder()
          */
         return $this->characterBuilderFactory->createBuilder();
+    }
+
+    private function notify(FightResult $fightResult): void
+    {
+        foreach ($this->observers as $observer) {
+            $observer->onFightFinished($fightResult);
+        }
     }
 }
