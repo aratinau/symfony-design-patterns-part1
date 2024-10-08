@@ -3,10 +3,16 @@
 namespace App;
 
 use App\Builder\CharacterBuilder;
+use App\Builder\CharacterBuilderFactory;
 use App\Character\Character;
 
 class GameApplication
 {
+    public function __construct(
+        private CharacterBuilderFactory $characterBuilderFactory
+    ) {
+    }
+
     public function play(Character $player, Character $ai): FightResult
     {
         $player->rest();
@@ -110,6 +116,12 @@ class GameApplication
 
     private function createCharacterBuilder(): CharacterBuilder
     {
-        return new CharacterBuilder();
+        /*
+         * Avant
+         *         return new CharacterBuilder();
+         * Maintenant
+         * L'instanciation est dans createBuilder()
+         */
+        return $this->characterBuilderFactory->createBuilder();
     }
 }

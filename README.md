@@ -22,5 +22,10 @@ php bin/console app:game:play
 to 
 
 ```php
-
+'fighter' => $this->createCharacterBuilder()
+    ->setMaxHealth(90)
+    ->setBaseDamage(12)
+    ->setAttackType('sword')
+    ->setArmorType('shield')
+    ->buildCharacter(),
 ```
